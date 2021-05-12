@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"allowSyntheticDefaultImports": true,
+		"charset": "utf8",
+		"lib": [
+			"esnext"
+		],
+		"module": "esnext",
+		"moduleResolution": "node",
+		"newLine": "lf",
+		"noEmit": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"target": "esnext",
+		"types": [
+			"node"
+		]
+	},
+	"include": [
+		"src/**/*"
+	]
+}
