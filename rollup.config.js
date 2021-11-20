@@ -15,6 +15,7 @@ const minified = {
 	]
 };
 
+// eslint-disable-next-line import/no-default-export
 export default [
 	{
 		input: './src/index.ts',
@@ -47,6 +48,7 @@ export default [
 			format: 'es'
 		},
 		plugins: [
+			typescript(),
 			definitions()
 		]
 	}

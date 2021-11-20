@@ -3,10 +3,10 @@
 This is a re-implementation of [eslint-import-resolver-typescript](https://github.com/alexgorbatchev/eslint-import-resolver-typescript)
 (ISC license) by [Alex Gorbatchev](https://github.com/alexgorbatchev).
 
-This package adds logic to take `baseDir` into account and won't apply path
-mapping outside of its package.
+This version adds logic to take the location of tsconfig into account and won't
+apply path mapping outside of its package.
 
-For example:
+## Example
 
 ```txt
 ├─ packages
@@ -33,8 +33,28 @@ two paths:
 - `packages/client/src/utils/constants.ts`
 - `packages/server/src/utils/constants.ts`
 
-It then simply takes the first one found and logs a warning, which breaks linter
-rules inside of the server package (because it comes later alphabetically).
+It then takes the first one found and logs a warning, which breaks inside of the
+server package (simply because it comes later alphabetically).
 
-This implementation considers the path of the file being linted and only maps
-paths defined in the tsconfig belonging to the current package.
+This version considers the location of tsconfig and won't apply path patterns
+defined in configs that don't relate to the file being linted.
+
+## Debugging
+
+To show debug logs from this resolver, run ESLint with the DEBUG environment
+variable set:
+
+```sh
+# Bash
+DEBUG="eslint-import-resolver-typescript" yarn eslint .
+
+# PowerShell
+& { $env:DEBUG='eslint-import-resolver-typescript'; yarn eslint . }
+```
+
+## Changelog
+
+- 1.1.0
+  - Fixed resolution for projects with nested TS config files.
+- 1.0.0
+  - Initial implementation.

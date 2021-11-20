@@ -3,10 +3,10 @@ import { dirname } from 'path';
 import { isCore, sync, SyncOpts } from 'resolve';
 
 import { getMappedPath } from './mapping';
+import type { ResolverResult } from './types';
 import { log } from './utils/debug';
 import { defaultConfig, defaultExtensions, defaultPackageFilter } from './utils/defaults';
 import { getTypesPackageName, hasJSExtension, removeJSExtension, removeQueryString } from './utils/paths';
-import type { ResolverResult } from './types';
 
 function tsResolve(originalPath: string, options?: SyncOpts): string {
 	try {
@@ -23,11 +23,11 @@ function tsResolve(originalPath: string, options?: SyncOpts): string {
 }
 
 export function resolve(source: string, file: string, config = defaultConfig): ResolverResult {
-	log('looking for:', source);
+	log('Looking for:', source);
 
 	const originalPath = removeQueryString(source);
 	if (isCore(originalPath)) {
-		log('matched as core module:', originalPath);
+		log('Matched as core module:', originalPath);
 		return {
 			found: true,
 			path: null
@@ -36,15 +36,15 @@ export function resolve(source: string, file: string, config = defaultConfig): R
 
 	const mappedPath = getMappedPath(originalPath, file, config);
 	if (mappedPath) {
-		log('mapped TypeScript path:', mappedPath);
+		log('Mapped TypeScript path:', mappedPath);
 	}
 
 	let absolutePath = null;
 	try {
-		absolutePath = tsResolve(mappedPath || originalPath, {
+		absolutePath = tsResolve(mappedPath ?? originalPath, {
 			basedir: dirname(file),
-			extensions: config.extensions || defaultExtensions,
-			packageFilter: config.packageFilter || defaultPackageFilter,
+			extensions: config.extensions ?? defaultExtensions,
+			packageFilter: config.packageFilter ?? defaultPackageFilter
 		});
 	}
 	catch {
@@ -54,7 +54,7 @@ export function resolve(source: string, file: string, config = defaultConfig): R
 	// attempt to look for @types/* in case we resolved to a JS file or are forced to by config
 	const shouldTryTypes = absolutePath
 		? hasJSExtension(absolutePath)
-		: config.alwaysTryTypes || false;
+		: config.alwaysTryTypes ?? false;
 
 	if (shouldTryTypes) {
 		const typesPackageName = getTypesPackageName(originalPath);
@@ -67,13 +67,13 @@ export function resolve(source: string, file: string, config = defaultConfig): R
 	}
 
 	if (absolutePath) {
-		log('matched path:', absolutePath)
+		log('Matched path:', absolutePath);
 		return {
 			found: true,
 			path: absolutePath
 		};
 	}
 
-	log('could not find:', originalPath);
+	log('Could not find:', originalPath);
 	return { found: false };
 }

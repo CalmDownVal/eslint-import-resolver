@@ -1,25 +1,26 @@
-import Glob from 'glob';
-import isGlob from 'is-glob';
-import { createMatchPath, loadConfig } from 'tsconfig-paths';
+import { dirname } from 'path';
 
+import { sync as globSync } from 'glob';
+import isGlob from 'is-glob';
+import { ConfigLoaderSuccessResult, createMatchPath, loadConfig } from 'tsconfig-paths';
+
+import type { ResolverConfig } from './types';
 import { log } from './utils/debug';
 import { defaultExtensions } from './utils/defaults';
 import { removeJSExtension } from './utils/paths';
-import type { ResolverConfig } from './types';
 
 interface Mapper {
-	readonly baseUrl: string;
+	readonly root: string;
 	(path: string): string | undefined;
 }
 
-let mappers: Mapper[] | undefined;
-let mappersBuiltForConfig: ResolverConfig;
+const cache = new Map<ResolverConfig, readonly Mapper[]>();
 
-function createMapper(baseUrl: string, paths: Record<string, string[]>, extensions: string[]): Mapper {
-	const matchPath = createMatchPath(baseUrl, paths);
+function createMapper(config: ConfigLoaderSuccessResult, extensions: string[]): Mapper {
+	const matchPath = createMatchPath(config.absoluteBaseUrl, config.paths);
 	const mapper = (path: string) => {
 		const match = matchPath(path, undefined, undefined, extensions);
-		if (match !== null) {
+		if (match) {
 			return match;
 		}
 
@@ -27,75 +28,88 @@ function createMapper(baseUrl: string, paths: Record<string, string[]>, extensio
 		if (pathWithoutExt !== path) {
 			return matchPath(pathWithoutExt, undefined, undefined, extensions);
 		}
+
+		return undefined;
 	};
 
-	mapper.baseUrl = baseUrl;
+	mapper.root = dirname(config.configFileAbsolutePath);
 	return mapper;
 }
 
 function getMappers(config: ResolverConfig) {
-	if (mappers && mappersBuiltForConfig === config) {
-		return mappers;
+	const cached = cache.get(config);
+	if (cached) {
+		return cached;
 	}
 
-	const project = typeof config.project === 'string'
+	// get the configured list of tsconfig paths
+	const patterns = typeof config.project === 'string'
 		? [ config.project ]
 		: Array.isArray(config.project)
 			? config.project
 			: [ process.cwd() ];
 
-	const paths = [];
-	for (let i = 0; i < project.length; ++i) {
-		const pathOrGlob = project[i];
-		if (isGlob(pathOrGlob)) {
-			const match = Glob.sync(pathOrGlob);
-			for (let j = 0; j < match.length; ++j) {
-				paths.push(match[j]);
-			}
+	if (patterns.length === 0) {
+		log('No tsconfig paths were configured!');
+		return [];
+	}
+
+	log(`Initializing mappers for:\n- ${patterns.join('\n- ')}`);
+
+	// resolve globs
+	let paths: string[] = [];
+	for (let i = 0; i < patterns.length; ++i) {
+		const pattern = patterns[i];
+		if (isGlob(pattern)) {
+			const match = globSync(pattern);
+			paths = paths.concat(match);
 		}
 		else {
-			paths.push(pathOrGlob);
+			paths.push(pattern);
 		}
 	}
 
-	mappers = [];
-	mappersBuiltForConfig = config;
-
+	// load TS configs and create mappers
+	const mappers: Mapper[] = [];
 	for (let i = 0; i < paths.length; ++i) {
 		const path = paths[i];
 		const tsConfig = loadConfig(path);
 		if (tsConfig.resultType !== 'success') {
-			log('failed to init tsconfig-paths:', tsConfig.message);
+			log('Failed to init tsconfig-paths:', tsConfig.message);
 			continue;
 		}
 
 		mappers.push(createMapper(
-			tsConfig.absoluteBaseUrl,
-			tsConfig.paths,
-			config.extensions || defaultExtensions
+			tsConfig,
+			config.extensions ?? defaultExtensions
 		));
+
+		log(`Created mapper for config: '${tsConfig.configFileAbsolutePath}', baseUri: '${tsConfig.absoluteBaseUrl}', patterns: '${Object.keys(tsConfig.paths).join("', '")}'.`);
 	}
 
+	// update cache
+	cache.set(config, mappers);
 	return mappers;
 }
 
-export function getMappedPath(originalPath: string, file: string, config: ResolverConfig): string | undefined {
+export function getMappedPath(originalPath: string, file: string, config: ResolverConfig) {
 	const mappers = getMappers(config);
-	const paths = [];
+
+	let mappedPath: string | null = null;
+	let bestScore = 0;
 
 	for (let i = 0; i < mappers.length; ++i) {
 		const mapper = mappers[i];
-		if (file.startsWith(mapper.baseUrl)) {
+		const score = mapper.root.length;
+
+		if (file.startsWith(mapper.root) && score > bestScore) {
 			const path = mapper(originalPath);
 			if (path) {
-				paths.push(path);
+				mappedPath = path;
+				bestScore = score;
 			}
 		}
 	}
 
-	if (paths.length > 1) {
-		log('mapped multiple TypeScript paths:', paths);
-	}
-
-	return paths[0];
+	return mappedPath;
 }

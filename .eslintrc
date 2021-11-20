@@ -1,6 +1,10 @@
 {
-  "extends": [
-    "plugin:prettier/recommended",
-    "plugin:mdx/recommended"
-  ]
+	"root": true,
+	"env": {
+		"node": true
+	},
+	"extends": [
+		"@calmdownval/eslint-config",
+		"@calmdownval/eslint-config/typescript"
+	]
 }
