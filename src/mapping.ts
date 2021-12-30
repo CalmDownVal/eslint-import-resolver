@@ -14,7 +14,7 @@ interface Mapper {
 	(path: string): string | undefined;
 }
 
-const cache = new Map<ResolverConfig, readonly Mapper[]>();
+const cache = new WeakMap<ResolverConfig, readonly Mapper[]>();
 
 function createMapper(config: ConfigLoaderSuccessResult, extensions: string[]): Mapper {
 	const matchPath = createMatchPath(config.absoluteBaseUrl, config.paths);
