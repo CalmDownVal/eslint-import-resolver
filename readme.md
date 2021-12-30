@@ -33,8 +33,9 @@ two paths:
 - `packages/client/src/utils/constants.ts`
 - `packages/server/src/utils/constants.ts`
 
-It then takes the first one found and logs a warning, which breaks inside of the
-server package (simply because it comes later alphabetically).
+It then blindly returns the first one found, which means the resolution works
+correctly only for the first package. For the second package, the resolution
+algorithm will point to the wrong file.
 
 This version considers the location of tsconfig and won't apply path patterns
 defined in configs that don't relate to the file being linted.
