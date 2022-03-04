@@ -1,7 +1,6 @@
 import { dirname } from 'path';
 
-import { sync as globSync } from 'glob';
-import isGlob from 'is-glob';
+import { isDynamicPattern, sync as globSync } from 'fast-glob';
 import { ConfigLoaderSuccessResult, createMatchPath, loadConfig } from 'tsconfig-paths';
 
 import type { ResolverConfig } from './types';
@@ -58,9 +57,8 @@ function getMappers(config: ResolverConfig) {
 
 	// resolve globs
 	let paths: string[] = [];
-	for (let i = 0; i < patterns.length; ++i) {
-		const pattern = patterns[i];
-		if (isGlob(pattern)) {
+	for (const pattern of patterns) {
+		if (isDynamicPattern(pattern)) {
 			const match = globSync(pattern);
 			paths = paths.concat(match);
 		}
