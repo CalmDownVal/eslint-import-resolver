@@ -1,23 +1,22 @@
-export interface PackageFilter {
-	(pkg: Record<string, unknown>): Record<string, unknown>;
-}
+import type { ResolveOptions } from 'enhanced-resolve';
+
+export type EnhancedResolveOptions = Omit<ResolveOptions, 'fileSystem' | 'useSyncFileSystemCalls'>;
 
 export interface ResolverConfig {
 	alwaysTryTypes?: boolean;
-	extensions?: string[];
-	packageFilter?: PackageFilter;
 	project?: string[] | string;
+	resolver?: EnhancedResolveOptions;
 }
 
 // the below interfaces conform to the spec defined here:
-// https://github.com/benmosher/eslint-plugin-import/blob/master/resolvers/README.md
+// https://github.com/benmosher/eslint-plugin-import/blob/main/resolvers/README.md
 
-export interface ResolverPathResult {
+export interface ResolverFileSystemResult {
 	found: true;
 	path: string;
 }
 
-export interface ResolverCoreResult {
+export interface ResolverBuiltInResult {
 	found: true;
 	path: null;
 }
@@ -28,6 +27,6 @@ export interface ResolverNoResult {
 }
 
 export type ResolverResult =
-	| ResolverPathResult
-	| ResolverCoreResult
+	| ResolverFileSystemResult
+	| ResolverBuiltInResult
 	| ResolverNoResult;

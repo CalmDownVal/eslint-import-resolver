@@ -33,9 +33,9 @@ two paths:
 - `packages/client/src/utils/constants.ts`
 - `packages/server/src/utils/constants.ts`
 
-It then blindly returns the first one found, which means the resolution works
-correctly only for the first package. For the second package, the resolution
-algorithm will point to the wrong file.
+The original version then blindly returns the first one found, which means the
+resolution works correctly only for the first package. For the second package,
+the resolution algorithm will point to the wrong file.
 
 This version considers the location of tsconfig and won't apply path patterns
 defined in configs that don't relate to the file being linted.
@@ -55,6 +55,8 @@ DEBUG="eslint-import-resolver-typescript" yarn eslint .
 
 ## Changelog
 
+- 1.2.0
+  - Updated to work with Yarn's PnP loader.
 - 1.1.0
   - Fixed resolution for projects with nested TS config files.
 - 1.0.0

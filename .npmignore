@@ -1,6 +1,9 @@
 src
 .editorconfig
 .eslintrc
-rollup.config.js
+.pnp.cjs
+.pnp.loader.mjs
+.yarnrc.yml
+rollup.config.mjs
 tsconfig.json
 yarn.lock
