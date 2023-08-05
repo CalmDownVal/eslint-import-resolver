@@ -1,6 +1,6 @@
 {
-	"name": "@calmdownval/eslint-import-resolver-typescript",
-	"version": "1.2.0",
+	"name": "@calmdownval/eslint-import-resolver",
+	"version": "1.0.0",
 	"license": "ISC",
 	"packageManager": "yarn@3.6.1",
 	"exports": {
@@ -16,6 +16,11 @@
 	"peerDependencies": {
 		"eslint": "8.46.0"
 	},
+	"peerDependenciesMeta": {
+		"eslint": {
+			"optional": true
+		}
+	},
 	"dependencies": {
 		"debug": "4.3.4",
 		"enhanced-resolve": "5.15.0",
@@ -25,7 +30,7 @@
 	},
 	"devDependencies": {
 		"@calmdownval/eslint-config": "2.0.2",
-		"@calmdownval/eslint-import-resolver-typescript": "1.2.0",
+		"@calmdownval/eslint-import-resolver": "1.0.0",
 		"@rollup/plugin-terser": "0.4.3",
 		"@rollup/plugin-typescript": "11.1.2",
 		"@types/debug": "4.1.8",
