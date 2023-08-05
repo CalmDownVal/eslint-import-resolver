@@ -4,11 +4,6 @@ export function hasJsExtension(path: string) {
 	return RE_JS.test(path);
 }
 
-// export function removeJsExtension(path: string) {
-// 	const match = RE_JS.exec(path);
-// 	return match ? path.slice(0, match.index) : path;
-// }
-
 export function removeQueryString(path: string) {
 	const index = path.lastIndexOf('?');
 	return index >= 0 ? path.slice(0, index) : path;

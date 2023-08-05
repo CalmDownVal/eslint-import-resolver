@@ -6,6 +6,7 @@
 	"extends": [
 		"@calmdownval/eslint-config",
 		"@calmdownval/eslint-config/import",
-		"@calmdownval/eslint-config/typescript"
+		"@calmdownval/eslint-config/typescript",
+		"@calmdownval/eslint-config/typescript-import"
 	]
 }
