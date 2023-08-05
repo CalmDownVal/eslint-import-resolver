@@ -29,7 +29,7 @@
 		"jsonc-parser": "3.2.0"
 	},
 	"devDependencies": {
-		"@calmdownval/eslint-config": "2.0.2",
+		"@calmdownval/eslint-config": "2.0.4",
 		"@calmdownval/eslint-import-resolver": "1.0.0",
 		"@rollup/plugin-terser": "0.4.3",
 		"@rollup/plugin-typescript": "11.1.2",

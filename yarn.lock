@@ -39,25 +39,34 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@calmdownval/eslint-config@npm:2.0.2":
-  version: 2.0.2
-  resolution: "@calmdownval/eslint-config@npm:2.0.2"
+"@calmdownval/eslint-config@npm:2.0.4":
+  version: 2.0.4
+  resolution: "@calmdownval/eslint-config@npm:2.0.4"
   peerDependencies:
-    "@calmdownval/eslint-import-resolver-typescript": 1.2.0
+    "@calmdownval/eslint-import-resolver": 1.0.0
     "@typescript-eslint/eslint-plugin": 6.2.1
     "@typescript-eslint/parser": 6.2.1
     eslint: 8.46.0
     eslint-plugin-import: 2.28.0
-  checksum: b5124b2d8f61957eecabd58dd2885f7b3d567c2279746049ee94d2d6baf3221a3347701ec774e81e6585ce6a6207555897925a0201cd2028f00bc29975f2741f
+  peerDependenciesMeta:
+    "@calmdownval/eslint-import-resolver":
+      optional: true
+    "@typescript-eslint/eslint-plugin":
+      optional: true
+    "@typescript-eslint/parser":
+      optional: true
+    eslint-plugin-import:
+      optional: true
+  checksum: a9d42e0066cdffff9e5ca28c53a31c7f285791f4eb7950874bae6b72df8170fd903af37bb78e9e893aa6dcb3505faa4f3282184b7ed3b37bfeb0f6b28af485c2
   languageName: node
   linkType: hard
 
-"@calmdownval/eslint-import-resolver-typescript@1.2.0, @calmdownval/eslint-import-resolver-typescript@workspace:.":
+"@calmdownval/eslint-import-resolver@1.0.0, @calmdownval/eslint-import-resolver@workspace:.":
   version: 0.0.0-use.local
-  resolution: "@calmdownval/eslint-import-resolver-typescript@workspace:."
+  resolution: "@calmdownval/eslint-import-resolver@workspace:."
   dependencies:
-    "@calmdownval/eslint-config": 2.0.2
-    "@calmdownval/eslint-import-resolver-typescript": 1.2.0
+    "@calmdownval/eslint-config": 2.0.4
+    "@calmdownval/eslint-import-resolver": 1.0.0
     "@rollup/plugin-terser": 0.4.3
     "@rollup/plugin-typescript": 11.1.2
     "@types/debug": 4.1.8
@@ -80,6 +89,9 @@ __metadata:
     typescript: 5.1.6
   peerDependencies:
     eslint: 8.46.0
+  peerDependenciesMeta:
+    eslint:
+      optional: true
   languageName: unknown
   linkType: soft
 
