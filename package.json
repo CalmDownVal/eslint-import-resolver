@@ -1,6 +1,6 @@
 {
 	"name": "@calmdownval/eslint-import-resolver",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"license": "ISC",
 	"packageManager": "yarn@3.6.1",
 	"exports": {
@@ -30,7 +30,7 @@
 	},
 	"devDependencies": {
 		"@calmdownval/eslint-config": "2.0.4",
-		"@calmdownval/eslint-import-resolver": "1.0.0",
+		"@calmdownval/eslint-import-resolver": "workspace:*",
 		"@rollup/plugin-terser": "0.4.3",
 		"@rollup/plugin-typescript": "11.1.2",
 		"@types/debug": "4.1.8",

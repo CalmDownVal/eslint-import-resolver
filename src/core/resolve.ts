@@ -8,11 +8,12 @@ import { log } from '~/utils/debug';
 import { defaultConfig } from '~/utils/defaultConfig';
 import { getTypesPackageName, hasJsExtension, removeQueryString } from '~/utils/path';
 
-import { createPathMappers, type PathMapper, type PathMapperOptions } from './PathMapper';
+import { createPathMapper, type PathMapper } from './PathMapper';
 import { createSourceResolver, type SourceResolver, type SourceResolverOptions } from './SourceResolver';
+import { locateProjects, readTsConfig, type LocateProjectsOptions } from './TSConfig';
 
 const cacheOptions: CacheOptions = { maxSize: 32 };
-const pathMapperCache = createCache<PathMapperOptions, readonly PathMapper[]>(cacheOptions);
+const pathMapperCache = createCache<LocateProjectsOptions, readonly PathMapper[]>(cacheOptions);
 const sourceResolverCache = createCache<SourceResolverOptions, SourceResolver>(cacheOptions);
 
 export function resolve(
@@ -52,7 +53,7 @@ export function resolve(
 	const pathMappers = pathMapperCache.getOrCreate({
 		cwd,
 		project: config.project
-	}, createPathMappers);
+	}, initPathMappers);
 
 	const mappedPaths = applyPathMapping(pathMappers, specifier, sourceDirectory);
 
@@ -66,12 +67,31 @@ export function resolve(
 	);
 }
 
+function initPathMappers(options: LocateProjectsOptions) {
+	const mappers = [];
+	for (const project of locateProjects(options)) {
+		const tsConfig = readTsConfig(project);
+		if (!tsConfig) {
+			continue;
+		}
+
+		const mapper = createPathMapper(tsConfig);
+		if (!mapper) {
+			continue;
+		}
+
+		mappers.push(mapper);
+	}
+
+	return mappers;
+}
+
 function applyPathMapping(pathMappers: readonly PathMapper[], specifier: string, sourceDirectory: string) {
 	let bestMapper: PathMapper | null = null;
 	let bestScore = 0;
 	for (const mapper of pathMappers) {
-		const score = mapper.root.length;
-		if (sourceDirectory.startsWith(mapper.root) && score > bestScore) {
+		const score = mapper.rootPath.length;
+		if (sourceDirectory.startsWith(mapper.rootPath) && score > bestScore) {
 			bestMapper = mapper;
 			bestScore = score;
 		}

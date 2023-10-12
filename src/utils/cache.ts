@@ -27,7 +27,7 @@ interface CacheEntry<TKey, TValue> {
 	hits: number;
 }
 
-const emptyCache: Cache<any, any> = {
+const EmptyCache: Cache<any, any> = {
 	get() {
 		return { hit: false };
 	},
@@ -41,7 +41,7 @@ const emptyCache: Cache<any, any> = {
 
 export function createCache<TKey, TValue>({ maxSize = Number.POSITIVE_INFINITY }: CacheOptions = {}): Cache<TKey, TValue> {
 	if (maxSize < 1) {
-		return emptyCache;
+		return EmptyCache;
 	}
 
 	const cache = new Map<string, CacheEntry<TKey, TValue>>();

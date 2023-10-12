@@ -61,12 +61,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@calmdownval/eslint-import-resolver@1.0.0, @calmdownval/eslint-import-resolver@workspace:.":
+"@calmdownval/eslint-import-resolver@workspace:*, @calmdownval/eslint-import-resolver@workspace:.":
   version: 0.0.0-use.local
   resolution: "@calmdownval/eslint-import-resolver@workspace:."
   dependencies:
     "@calmdownval/eslint-config": 2.0.4
-    "@calmdownval/eslint-import-resolver": 1.0.0
+    "@calmdownval/eslint-import-resolver": "workspace:*"
     "@rollup/plugin-terser": 0.4.3
     "@rollup/plugin-typescript": 11.1.2
     "@types/debug": 4.1.8

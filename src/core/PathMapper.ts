@@ -1,102 +1,12 @@
-import { dirname, join, resolve } from 'node:path';
-
-import { isDynamicPattern as isGlob, sync as globSync, type Options as GlobOptions } from 'fast-glob';
-import { parse } from 'jsonc-parser';
+import { resolve } from 'node:path';
 
 import { log } from '~/utils/debug';
-import { getFileSystem } from '~/utils/fileSystem';
 
-
-export interface PathMapperOptions {
-	readonly cwd: string;
-	readonly project: string | readonly string[];
-}
+import type { TSConfigWithMetadata } from './TSConfig';
 
 export interface PathMapper {
-	readonly root: string;
+	readonly rootPath: string;
 	map(specifier: string): null | readonly string[];
-}
-
-export function createPathMappers(options: PathMapperOptions): readonly PathMapper[] {
-	const projects = locateProjects(options);
-	const mappers = [];
-
-	for (const project of projects) {
-		const mapper = getPathsMapper(project);
-		if (mapper) {
-			mappers.push(mapper);
-		}
-	}
-
-	return mappers;
-}
-
-
-function locateProjects({ cwd, project }: PathMapperOptions): Iterable<string> {
-	// get the configured list of project paths
-	const patterns: string[] = typeof project === 'string'
-		? [ project ]
-		: Array.isArray(project)
-			? project
-			: [ cwd ];
-
-	if (patterns.length === 0) {
-		log('No TSConfig paths were configured.');
-		return [];
-	}
-
-	// resolve globs
-	const paths = new Set<string>();
-	const globOptions: GlobOptions = {
-		absolute: true,
-		cwd,
-		ignore: [ '**/node_modules/**' ]
-	};
-
-	for (const pattern of patterns) {
-		if (isGlob(pattern)) {
-			const matches = globSync(pattern, globOptions);
-			matches.forEach(match => paths.add(match));
-		}
-		else {
-			paths.add(resolve(cwd, pattern));
-		}
-	}
-
-	return paths;
-}
-
-
-const RE_TSCONFIG = /[/\\]tsconfig.json$/i;
-
-function getPathsMapper(absoluteProjectPath: string): PathMapper | null {
-	const project = RE_TSCONFIG.test(absoluteProjectPath)
-		? absoluteProjectPath
-		: join(absoluteProjectPath, 'tsconfig.json');
-
-	try {
-		const tsConfigRaw = getFileSystem().readFileSync(project, { encoding: 'utf8' }) as string;
-		const tsConfig: TSConfig = parse(tsConfigRaw);
-		return createPathMapper(tsConfig, project);
-	}
-	catch {
-		log('Could not read TSConfig at %s.', project);
-		return null;
-	}
-}
-
-
-interface TSConfigPaths {
-	[pattern: string]: readonly string[];
-}
-
-interface TSConfigCompilerOptions {
-	readonly baseUrl?: string;
-	readonly paths?: TSConfigPaths | null;
-}
-
-interface TSConfig {
-	readonly compilerOptions?: TSConfigCompilerOptions;
 }
 
 interface PathMatcher {
@@ -104,17 +14,16 @@ interface PathMatcher {
 	readonly replacing: readonly PathPattern[];
 }
 
-function createPathMapper(tsConfig: TSConfig, path: string): PathMapper | null {
+export function createPathMapper(tsConfig: TSConfigWithMetadata): PathMapper | null {
 	const baseUrl = tsConfig.compilerOptions?.baseUrl;
 	const paths = tsConfig.compilerOptions?.paths;
 
 	if (typeof baseUrl !== 'string' || paths === null || typeof paths !== 'object') {
-		log('TSConfig at %s does not define any paths mappings.', path);
+		log('TSConfig at %s does not define any paths mappings.', tsConfig.configPath);
 		return null;
 	}
 
-	const root = dirname(path);
-	const resolvedBaseUrl = resolve(root, baseUrl);
+	const resolvedBaseUrl = resolve(tsConfig.rootPath, baseUrl);
 	const matchers: PathMatcher[] = [];
 
 	for (const matchPatternStr in paths) {
@@ -132,7 +41,7 @@ function createPathMapper(tsConfig: TSConfig, path: string): PathMapper | null {
 	}
 
 	return {
-		root,
+		rootPath: tsConfig.rootPath,
 		map(specifier) {
 			for (let i = 0; i < matchers.length; ++i) {
 				const { matching, replacing } = matchers[i];
@@ -147,6 +56,7 @@ function createPathMapper(tsConfig: TSConfig, path: string): PathMapper | null {
 	};
 }
 
+type PathPattern = WildcardPathPattern | StaticPathPattern;
 
 interface WildcardPathPattern {
 	readonly isWildcard: true;
@@ -158,8 +68,6 @@ interface StaticPathPattern {
 	readonly isWildcard: false;
 	readonly pattern: string;
 }
-
-type PathPattern = WildcardPathPattern | StaticPathPattern;
 
 const RE_WILDCARD = /^(.*)\*(.*)$/;
 
