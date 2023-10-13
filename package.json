@@ -1,8 +1,8 @@
 {
 	"name": "@calmdownval/eslint-import-resolver",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"license": "ISC",
-	"packageManager": "yarn@3.6.1",
+	"packageManager": "yarn@3.6.4",
 	"exports": {
 		".": {
 			"require": "./build/index.min.cjs",
@@ -14,7 +14,7 @@
 		"build": "rollup --config"
 	},
 	"peerDependencies": {
-		"eslint": "8.46.0"
+		"eslint": "8.51.0"
 	},
 	"peerDependenciesMeta": {
 		"eslint": {
@@ -29,17 +29,17 @@
 		"jsonc-parser": "3.2.0"
 	},
 	"devDependencies": {
-		"@calmdownval/eslint-config": "2.0.4",
+		"@calmdownval/eslint-config": "2.1.4",
 		"@calmdownval/eslint-import-resolver": "workspace:*",
 		"@rollup/plugin-terser": "0.4.3",
 		"@rollup/plugin-typescript": "11.1.2",
 		"@types/debug": "4.1.8",
 		"@types/is-core-module": "2.2.0",
 		"@types/node": "20.4.5",
-		"@typescript-eslint/eslint-plugin": "6.2.1",
-		"@typescript-eslint/parser": "6.2.1",
-		"eslint": "8.46.0",
-		"eslint-plugin-import": "2.28.0",
+		"@typescript-eslint/eslint-plugin": "6.7.5",
+		"@typescript-eslint/parser": "6.7.5",
+		"eslint": "8.51.0",
+		"eslint-plugin-import": "2.28.1",
 		"rollup": "3.26.3",
 		"rollup-plugin-delete": "2.0.0",
 		"rollup-plugin-dts": "5.3.0",
