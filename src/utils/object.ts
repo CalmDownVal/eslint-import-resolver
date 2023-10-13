@@ -1,11 +1,5 @@
 export function mergeObjectsDeep(object: any, patch: any): any {
-	if (Array.isArray(patch)) {
-		return Array.isArray(object)
-			? object.concat(patch)
-			: patch;
-	}
-
-	if (!isPlainObject(patch)) {
+	if (!(isPlainObject(object) && isPlainObject(patch))) {
 		return patch;
 	}
 
